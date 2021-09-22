@@ -30,7 +30,7 @@ def create_app():
     
     @app.route('/quotes')
     @requires_auth('get:quotes')
-    def get_quotes():
+    def get_quotes(jwt):
         quotes = Quote.query.order_by('id').all()
         if not quotes:
             abort(404)
@@ -44,7 +44,7 @@ def create_app():
 
     @app.route('/persons')
     @requires_auth('get:persons')
-    def get_persons():
+    def get_persons(jwt):
         persons = Person.query.order_by('id').all()
         if not persons:
             abort(404)
@@ -59,7 +59,7 @@ def create_app():
 
     @app.route('/quotes', methods=['POST'])
     @requires_auth('create:quote')
-    def create_quote():
+    def create_quote(jwt):
         body = request.get_json()
         title = body.get('title', None)
         description = body.get('description', None)
@@ -90,7 +90,7 @@ def create_app():
     
     @app.route('/persons', methods=['POST'])
     @requires_auth('create:person')
-    def create_person():
+    def create_person(jwt):
         body = request.get_json()
         name = body.get('name', None)
         if name is None:
@@ -114,7 +114,7 @@ def create_app():
 
     @app.route('/quotes/<int:id>', methods=['PATCH'])
     @requires_auth('edit:quote')
-    def edit_quote(id):
+    def edit_quote(jwt, id):
         body = request.get_json()
         print(body)
         
@@ -143,7 +143,7 @@ def create_app():
     
     @app.route('/persons/<int:id>', methods=['PATCH'])
     @requires_auth('edit:person')
-    def edit_person(id):
+    def edit_person(jwt, id):
         body = request.get_json()
         print(body)
         name = body.get('name', None)
@@ -162,7 +162,7 @@ def create_app():
     
     @app.route('/quotes/<int:id>', methods=['DELETE'])
     @requires_auth('remove:quote')
-    def remove_quote(id):
+    def remove_quote(jwt, id):
         quote = Quote.query.get_or_404(id)
         try:
             quote.delete()
@@ -176,7 +176,7 @@ def create_app():
     
     @app.route('/persons/<int:id>', methods=['DELETE'])
     @requires_auth('remove:person')
-    def remove_person(id):
+    def remove_person(jwt, id):
         person = Person.query.get_or_404(id)
         try:
             person.delete()
@@ -215,4 +215,4 @@ def create_app():
 
 app = create_app()
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
