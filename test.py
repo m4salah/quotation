@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from app import create_app
 from models import setup_db, Person, Quote
+from auth import AuthError, requires_auth
 
 
 class QuotationTestCase(unittest.TestCase):

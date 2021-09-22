@@ -1,13 +1,12 @@
-import json
+import json, os
 from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-
-AUTH0_DOMAIN = 'mohamedspicer.eu.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'quotation'
+auth0_domain = os.environ['AUTH0_DOMAIN']
+algorithms = os.environ['ALGORITHMS']
+api_audience = os.environ['API_AUDIENCE']
 
 ## AuthError Exception
 class AuthError(Exception):
@@ -57,7 +56,7 @@ def check_permissions(permission, payload):
     return True
 
 def verify_decode_jwt(token):
-    jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    jsonurl = urlopen(f'https://{auth0_domain}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
     
     # GET THE DATA IN THE HEADER
@@ -88,9 +87,9 @@ def verify_decode_jwt(token):
             payload = jwt.decode(
                 token,
                 rsa_key,
-                algorithms=ALGORITHMS,
-                audience=API_AUDIENCE,
-                issuer='https://' + AUTH0_DOMAIN + '/'
+                algorithms=algorithms,
+                audience=api_audience,
+                issuer='https://' + auth0_domain + '/'
             )
 
             return payload
