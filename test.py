@@ -6,6 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 from app import create_app
 from models import setup_db, Person, Quote
 
+DB_HOST = os.getenv('DB_HOST', '127.0.0.1:5432')  
+DB_USER = os.getenv('DB_USER', 'mohamed')  
+DB_NAME = os.getenv('DB_NAME', 'quotation')
+admin_token_v = os.environ['admin_JWT']
 
 class QuotationTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -14,12 +18,12 @@ class QuotationTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "quotation"
-        self.database_path_local = "postgresql://{}@{}/{}".format('mohamed', 'localhost:5432', self.database_name)
+        self.database_path_local = "postgresql://{}@{}/{}".format(DB_USER, DB_HOST, DB_NAME)
         self.database_path_heroku = os.environ['DATABASE_URL']
-        setup_db(self.app, self.database_path_heroku)
+        setup_db(self.app, self.database_path_local)
 
-        self.admin_token = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkFUVm1yTTA2eTFXd0h4U2hHNlZncSJ9.eyJpc3MiOiJodHRwczovL21vaGFtZWRzcGljZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDYxNGIzZjg4YjM1ODNmMDA3MDVmMGFmMiIsImF1ZCI6InF1b3RhdGlvbiIsImlhdCI6MTYzMjMyMTQ3NSwiZXhwIjoxNjMyMzI4Njc1LCJhenAiOiJIY0FCdldkTHQ2TUt0WTVCQ2NLaDRFelI2NnF2WnhqdiIsInNjb3BlIjoiIiwicGVybWlzc2lvbnMiOlsiY3JlYXRlOnBlcnNvbiIsImNyZWF0ZTpxdW90ZSIsImVkaXQ6cGVyc29uIiwiZWRpdDpxdW90ZSIsImdldDpwZXJzb25zIiwiZ2V0OnF1b3RlcyIsInJlbW92ZTpwZXJzb24iLCJyZW1vdmU6cXVvdGUiXX0.Pfvw4qZmKgSnbdXjTzX-DIAP_71snVDib3bvyyLARSYvPfFUcW2qd6AQ-_aw0xhR-tCGJChkH0-MFulhAFzhjTAvO4W_OaK9JpKZVYVZjkvRH0bcZBNXLiOgmGri8gC9Oj8tvHJg1Xz9mCPdk0bUsa3BTFQHS7-a8w_mMgYq6dMLNMiZjCvdNEpZW2FwXij27zaY8Ps0OeEtUiipJsj9daKKeDdam2TbtWv-VG5QAvsBy5fGrHqpKq3LOZAwxgA7B1nqAji0RgtT1vdBXj5tMHrEDatKKaILvuWClxqkc4IOBXh9XmjBSb84biYwMxlISD8cO6Qw2syIHcBTUPnFXQ"
+        self.admin_token = "Bearer {}".format(admin_token_v)
+        # print(self.admin_token)
         self.new_person = {
             'name': 'Mohamed'
         }

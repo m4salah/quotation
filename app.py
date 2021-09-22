@@ -21,6 +21,12 @@ def create_app():
             'GET, POST, DELETE, PATCH, OPTIONS')
         return response
     
+    '''
+    implement endpoint
+        GET /
+            public endpoint
+        returns status code 200 and json {"success": True, "description": "Quotation system is running."}
+    '''
     @app.route('/', methods=['GET'])
     def index():
         return jsonify({
@@ -28,6 +34,12 @@ def create_app():
             'description': 'Quotation system is running.'
         })
     
+    '''
+    implement endpoint
+        GET /quotes
+            private endpoint require permission=get:quotes
+        returns status code 200 and json {"success": True, "quotes": quotes, "'total_quotes":4}
+    '''
     @app.route('/quotes')
     @requires_auth('get:quotes')
     def get_quotes(jwt):
@@ -41,7 +53,13 @@ def create_app():
             'quotes': quotes_formated,
             'total_quotes': len(quotes)
         })
-
+    
+    '''
+    implement endpoint
+        GET /persons
+            private endpoint require permission=get:persons
+        returns status code 200 and json {"success": True, "persons": persons, "'total_persons":4}
+    '''
     @app.route('/persons')
     @requires_auth('get:persons')
     def get_persons(jwt):
@@ -56,7 +74,13 @@ def create_app():
             'persons': persons_formated,
             'total_persons': len(persons)
         })
-
+    
+    '''
+    implement endpoint
+        POST /quotes
+            private endpoint require permission=create:quote
+        returns status code 200 and json {'success': True,'created': quote.id, 'quotes': quotes_formated, 'total_quotes': len(quotes_formated)}
+    '''
     @app.route('/quotes', methods=['POST'])
     @requires_auth('create:quote')
     def create_quote(jwt):
@@ -88,6 +112,12 @@ def create_app():
         except:
             abort(422)
     
+    '''
+    implement endpoint
+        POST /persons
+            private endpoint require permission=create:person
+        returns status code 200 and json {'success': True,'created': person.id, 'persons': persons_formated, 'total_persons': len(persons_formated)}
+    '''
     @app.route('/persons', methods=['POST'])
     @requires_auth('create:person')
     def create_person(jwt):
@@ -99,8 +129,6 @@ def create_app():
         try:
             person = Person(name=name)
             person.insert()
-            print("here")
-            print(person.name)
             persons_after_create = Person.query.order_by('id').all()
             persons_formated = [person.format() for person in persons_after_create]
             return jsonify({
@@ -112,11 +140,16 @@ def create_app():
         except:
             abort(422)
 
+    '''
+    implement endpoint
+        PATCH /quotes/<int:id>
+            private endpoint require permission=edit:quote
+        returns status code 200 and json {'success': True,'quote_id': quote.id}
+    '''
     @app.route('/quotes/<int:id>', methods=['PATCH'])
     @requires_auth('edit:quote')
     def edit_quote(jwt, id):
         body = request.get_json()
-        print(body)
         
         title = body.get('title', None)
         description = body.get('description', None)
@@ -141,11 +174,16 @@ def create_app():
             abort(422)
     
     
+    '''
+    implement endpoint
+        PATCH /persons/<int:id>
+            private endpoint require permission=edit:person
+        returns status code 200 and json {'success': True,'person_id': person.id}
+    '''
     @app.route('/persons/<int:id>', methods=['PATCH'])
     @requires_auth('edit:person')
     def edit_person(jwt, id):
         body = request.get_json()
-        print(body)
         name = body.get('name', None)
         
         person = Person.query.get_or_404(id)
@@ -160,6 +198,12 @@ def create_app():
         except:
             abort(422)
     
+    '''
+    implement endpoint
+        DELETE /quotes/<int:id>
+            private endpoint require permission=remove:quote
+        returns status code 200 and json {'success': True,'id': id}
+    '''
     @app.route('/quotes/<int:id>', methods=['DELETE'])
     @requires_auth('remove:quote')
     def remove_quote(jwt, id):
@@ -174,6 +218,12 @@ def create_app():
             abort(422)
     
     
+    '''
+    implement endpoint
+        DELETE /persons/<int:id>
+            private endpoint require permission=remove:person
+        returns status code 200 and json {'success': True,'id': id}
+    '''
     @app.route('/persons/<int:id>', methods=['DELETE'])
     @requires_auth('remove:person')
     def remove_person(jwt, id):
@@ -187,6 +237,10 @@ def create_app():
         except:
             abort(422)
     
+    
+    '''
+    error handler for 404
+    '''
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -195,6 +249,10 @@ def create_app():
             "message": "resource not found"
         }), 404
 
+
+    '''
+    error handling for unprocessable entity
+    '''
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
@@ -203,6 +261,10 @@ def create_app():
             "message": "Unprocessable"
         }), 422
 
+
+    '''
+    error handler for AuthError
+    '''
     @app.errorhandler(AuthError)
     def handle_auth_error(ex):
         return jsonify({
@@ -210,9 +272,11 @@ def create_app():
             "error": ex.status_code,
             'message': ex.error
         }), 401
+    
+    
     return app
 
 
 app = create_app()
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
