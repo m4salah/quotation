@@ -1,6 +1,7 @@
 # Quotation Capstone Project
 
 This is my final capstone project for Udacity's FullStack Web Developer Nanodegree.
+Quotations system is a system that manage quotes said by people
 Web app can be accessed at [here](https://quotation-m.herokuapp.com/)
 
 ##### Project Dependencies
